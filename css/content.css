@@ -1,0 +1,44 @@
+/* 
+    Created on : Oct 16, 2016, 9:50:54 PM
+    Author     : Daniel
+*/
+article{
+    height:100%;
+}
+
+#date_form,#map{
+    
+    max-height: 80%;
+    height:80%;
+    min-height: 80%;
+}
+
+#date_form{
+    width: 12%;
+    float:left;
+    background: #125492;
+}
+
+#map{
+    margin-bottom: 8%;
+    margin-right: 12%;
+}
+
+
+
+.date_form{
+    color: white;
+    text-align: center;
+}
+
+.input_date{
+    margin-left: 5%;
+    margin-right: 5%;
+    width: 90%;
+     text-align: center;
+}
+
+#error_msg{
+    color: red;
+    font-size: 0.5em;
+}
