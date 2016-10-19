@@ -42,3 +42,61 @@ article{
     color: red;
     font-size: 0.5em;
 }
+
+#legend{
+    background-color: white;
+    margin-left: 5%;
+    margin-right: 5%;
+}
+
+#legend li{
+    list-style-type: disc;
+    margin-left: 20%;
+}
+
+#legend li:last-child{
+    list-style-type: circle;
+    color:black
+}
+
+#p_legend{
+    color:white;
+    margin-top: 1%;
+    text-align: center;
+}
+
+#color1{
+    color: white;
+    text-shadow:
+    -0.5px -0.5px 0 #000,
+    0.5px -0.5px 0 #000,
+    -0.5px 0.5px 0 #000,
+    0.5px 0.5px 0 #000; 
+}
+#color2{
+    color: #0b9c31;
+}
+#color3{
+    color: #003f27;
+}
+#color4{
+    color: #ffe216;
+}
+#color5{
+    color: #cfc823;
+}
+#color6{
+    color: #f48319;
+}
+#color7{
+    color: #bc116e;
+}
+#color8{
+    color: #ff0000;
+}
+#color9{
+    color: #5b0000;
+}
+#color10{
+    color: #000000;
+}

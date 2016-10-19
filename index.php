@@ -39,7 +39,22 @@
                     <input type="time" name="time" class="input_date" id="time"><br>
                     <p class="date_form" id="error_msg"></p>
                 </form>
+                <br>
+                <p id="p_legend">Legend(db)</p>
+                <ul id="legend">
+                    <li id="color10"> > 100</li>
+                    <li id="color9">90-99</li>
+                    <li id="color8">80-89</li>
+                    <li id="color7">70-79</li>
+                    <li id="color6">60-69</li>
+                    <li id="color5">50-59</li>
+                    <li id="color4">40-49</li>
+                    <li id="color3">30-39</li>
+                    <li id="color2">20-29</li>
+                    <li > <p id="color1">< 20</p></li>
+                </ul>
             </div>
+            
            
             <div id="map" > 
                  
