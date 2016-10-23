@@ -22,10 +22,11 @@
             
             <nav>
                 <ul id="menu_list">
-                    <li><a href="index.php"> <img src="./icons/home_button.png" alt="Home"></a></li>
-                    <li><a href="index.php">Account</a></li>
-                    <li><a href="index.php">About</a></li>
-                    <li><a href="index.php">Help</a></li>
+                    <li><a href="index.php"> <img src="./icons/home_button.png" alt="Home"></a></li><!--
+                 --><li><a href="index.php">Account</a></li><!--
+                 --><li><a href="index.php">About</a></li><!--
+                  --><li><a href="index.php">Help</a></li><!--
+                  -->
                 </ul>
             </nav>
             

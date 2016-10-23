@@ -49,11 +49,12 @@ nav {
 #menu_list{
     list-style: none;
     display: block;
+    float: left;
 }
 
 #menu_list li{
     display: inline-block;
-    float: left;
+    
     padding-right: 1em;
     padding-left: 1em;
     border-left: 1px solid white;
@@ -75,6 +76,7 @@ nav {
     color: white;
     display: block;
     font-size: 1em;
+    height: 100%;
 }
 
 #menu_list li:hover{
