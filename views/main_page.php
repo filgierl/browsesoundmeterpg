@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <?php include 'globalVariables.php';?>
+       
        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
        <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&dummy=.js"></script>   
         
@@ -22,10 +22,10 @@
 
                 <nav>
 
-                    <div id="menu_list"><a href="index.php"> <img src="./static_resources/icons/home_button.png" alt="Home"></a>
-              </div><div id="menu_list"><a href="index.php">Account</a>
-              </div><div id="menu_list"><a href="index.php">About</a> 
-              </div><div id="menu_list"><a href="index.php">Help</a></div>                          
+                    <div id="menu_list"><a href="<?php echo $PAGE_URL?>"> <img src="./static_resources/icons/home_button.png" alt="Home"></a>
+              </div><div id="menu_list"><a href="<?php echo "{$PAGE_URL}{$ACCOUNT_ACTION}" ?>">Account</a>
+              </div><div id="menu_list"><a href="<?php echo "{$PAGE_URL}{$ABOUT_ACTION}" ?>">About</a> 
+              </div><div id="menu_list"><a href="<?php echo "{$PAGE_URL}{$HELP_ACTION}" ?>">Help</a></div>                          
                 </nav>
 
             </header>
