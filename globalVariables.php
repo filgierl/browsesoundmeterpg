@@ -15,7 +15,7 @@ define("HELP_ACTION","/help");
 define("REGISTER_ACTION","/register");
 define("PROCESS_LOGIN_ACTION","/process_login");
 define("REGISTER_WEB_ACTION","/register_web");
-
+define("NOISE_ACTION","/noise");
 
 define("EMPTY_FORM","User send empty values in register POST");
 define("FORM_WITHOUT_DATA","User send empty register POST");

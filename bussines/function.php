@@ -1,7 +1,6 @@
-<!-- source http://www.wikihow.com/Create-a-Secure-Login-Script-in-PHP-and-MySQL 
-     license https://creativecommons.org/licenses/by-nc-sa/3.0/-->
-
 <?php
+// source http://www.wikihow.com/Create-a-Secure-Login-Script-in-PHP-and-MySQL 
+//     license https://creativecommons.org/licenses/by-nc-sa/3.0/
 include_once '../globalVariables.php';
 include_once '../globalVariables.php';
 include_once '../bussines/db_connect.php';

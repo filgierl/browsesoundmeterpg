@@ -25,7 +25,46 @@ function initMap() {
 }
       
 function addPoint(location) {
-    var noiseLevel = 1 + Math.floor(Math.random() * 120);
+    var locationJSON = { "latitude" : location.lat(), "longitude"  : location.lng() };
+    $.ajax({
+        url:'/browsesoundmeterpg/web/noise',
+        type:'POST',
+        dataType: 'json',
+        contentType: "application/json; charset=utf-8",
+        data: JSON.stringify(locationJSON),
+        success: function(data){
+            handleResponse(location,data);
+        },
+        failure: function(errMsg) {
+             //TODO
+        }
+    });
+   
+}
+
+function handleResponse(location,data){
+    var noiseLevel = 0.0;
+    var deviation = 0;
+    var weight = 0.0;
+    var  probability = [];
+    for(var i=0;i<141;i++)
+        probability[i] = 0;
+
+    for(var i=0;i<data.length;i++){
+        noiseLevel += parseInt(data[i].noiseLevel) * parseFloat(data[i].weight);
+        weight += parseFloat(data[i].weight);
+    }
+    noiseLevel = noiseLevel /weight;
+    for(var i=0;i<data.length;i++){
+        deviation += Math.abs(parseInt(data[i].noiseLevel) - parseInt(noiseLevel));
+        probability[parseInt(data[i].noiseLevel)] += 1;
+    }
+    deviation = parseInt(deviation/data.length);
+    var prob = probability[parseInt(noiseLevel)]/data.length;
+    drawCircle(location,parseInt(noiseLevel));
+}
+
+function drawCircle(location,noiseLevel){
     var color = getColor(noiseLevel);
     var circle;
     if($('#color1').css("color") === color){
@@ -48,14 +87,10 @@ function addPoint(location) {
         fillColor:color,
         fillOpacity:0.4
         });
-    }
-     
-
-    
+    }   
     google.maps.event.addListener(circle, 'rightclick', function(event) {
         circle.setMap(null);
     });
-
 }
 
 function getColor(noiseLevel){
