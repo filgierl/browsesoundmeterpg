@@ -40,11 +40,11 @@ header{
 }
 
 nav {
-    overflow:auto;
+    overflow-y: hidden;
     background-color: #125492;
 }
 
-#menu_list{
+.menu_list{
     float: left;
     height: 1em;
     width: auto;
@@ -52,7 +52,7 @@ nav {
     border-right: 1px solid white;
     padding: 0.5%;
 }
-#menu_list a{
+.menu_list a{
     color: white;
     text-decoration: none;
     text-align: center;
@@ -60,31 +60,35 @@ nav {
     font-size: 1em;   
 }
 
-#menu_list:first-child{
+.menu_list:first-child{
     border-left: 0;
 }
 
-#menu_list:last-child{ 
+#last_div{ 
     border-right: 1.5px solid white; 
-    
 }
 
-#menu_list a img{
+.menu_list a img{
     height: 100%;
 }
 
 
-#menu_list:hover{
+.menu_list:hover{
     background-color: #527393;
     cursor: pointer;
     color: rgba(50,13,14,156);
 }
 
 
-#menu_list a:hover{
+.menu_list a:hover{
     color: rgba(50,13,14,156); 
 }
 
-#menu_list:hover  *{
+.menu_list:hover  *{
    color: rgba(50,13,14,156);
 }
+
+.clear{
+    clear: both;
+}
+

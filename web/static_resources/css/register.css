@@ -1,0 +1,56 @@
+/* 
+    Created on : Oct 31, 2016, 6:27:34 PM
+    Author     : Daniel
+*/
+
+.form{
+    display: inline-block;
+    margin-left: auto;
+    margin-right: auto;
+}
+.input{
+    border: 2px solid #125492;
+    border-radius: 5px;
+}
+.inputs{
+    font-size: 0.7em;
+    text-align: left;
+}
+form{
+    border: 1px solid rgba(12,84,146,0.4);
+    border-radius: 5px;
+    margin-left: 20%;
+    margin-right: 20%;
+    margin-top: 0.25%;
+    text-align:center;
+    box-shadow: 0px 0px 15px;
+}
+#register_button{
+    text-align: center;
+    width: 100%;
+    color: white;
+    background-color: #125492;
+    border-radius: 5px;
+    margin-top: 2%;
+    margin-bottom: 2%;
+}
+#terms_and_privacy{
+    font-size:0.6em;
+}
+.terms_and_privacy input{
+    display: inline-block;
+}
+.terms_and_privacy label{
+    display: inline-block;
+}
+.terms_and_privacy{
+    margin-top: 2%;
+    margin-bottom: 2%;
+}
+#error_msg{
+    color: red;
+    display:none;
+    font-size:0.5em;
+   
+}
+

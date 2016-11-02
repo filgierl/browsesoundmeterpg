@@ -1,31 +1,38 @@
+<?php
+include_once '../bussines/function.php';
+include_once '../bussines/db_connect.php';
+include_once '../globalVariables.php';
+?>
+<!--    Author     : Daniel-->
 <!DOCTYPE html>
 <html>
     <head>
         <meta charset="UTF-8">
-       <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-       <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&dummy=.js"></script>   
-        
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+        <script src="./static_resources/scripts/form.js"></script>
         <title><?php echo $web_name ?></title>
         <link rel="stylesheet" type="text/css" href="./static_resources/css/header.css">
+        <link rel="stylesheet" type="text/css" href="./static_resources/css/login.css">
     </head>
     <body>
           <div class="container">  
-            <header>
-
-                <div id="banner">
-                    <h1 id="banner_text"><?php echo $web_name ?></h1>
-                </div>
-
-                <nav>
-
-                    <div id="menu_list"><a href="<?php echo $PAGE_URL?>"> <img src="./static_resources/icons/home_button.png" alt="Home"></a>
-              </div><div id="menu_list"><a href="<?php echo "{$PAGE_URL}{$ACCOUNT_ACTION}" ?>">Account</a>
-              </div><div id="menu_list"><a href="<?php echo "{$PAGE_URL}{$ABOUT_ACTION}" ?>">About</a> 
-              </div><div id="menu_list"><a href="<?php echo "{$PAGE_URL}{$HELP_ACTION}" ?>">Help</a></div>                          
-                </nav>
-
-            </header>
-        Account
+            <?php include("../views/header.php") ?>
+            <?php
+                $db = DataBaseManager::getInstance();
+                $mysqli = $db->getConnection(); 
+                if(login_check($mysqli) == true){ 
+                    require 'account_information.php';
+                }else{
+                    require 'login.php';
+                    
+                    global $ERROR_MSG, $ERRORS;
+                    if($ERRORS === Errors::LOGIN_ERROR || $ERRORS === Errors::BRUTE_FORCE){
+                        $ERRORS = 100;
+                        echo "<p style=\"color:red;font-size:0.5em;display:block;text-align:center;\">".$ERROR_MSG."</p>";
+                    } 
+                }                
+            ?>
+            
           </div>
     </body>
 </html>

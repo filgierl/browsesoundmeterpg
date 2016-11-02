@@ -34,7 +34,8 @@ article{
     margin-left: 5%;
     margin-right: 5%;
     width: 90%;
-     text-align: center;
+    text-align: center;
+    border-radius: 5px;
 }
 
 #error_msg{
@@ -44,6 +45,7 @@ article{
 
 #legend{
     background-color: white;
+    border-radius: 5px;
     margin-left: 5%;
     margin-right: 5%;
 }
