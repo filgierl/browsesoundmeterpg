@@ -4,14 +4,19 @@ if(isset($data) && isset($data->latitude) && isset($data->longitude)){
     $lat = $data->latitude;
     $lon = $data->longitude;
     $response = array();
-    
+    $latTmp = 0.0;
+    $longTmp = 0.0;
     for($i=0;$i<1000;$i++){
         $noiseLevel = rand(20, 80);
-        if($noiseLevel < 65)
+        if($noiseLevel < 80)
             $weight = round(floatval(rand()/  getrandmax()),2);
         else
            $weight = 0.8; 
-        $response[$i] = array('latitude'=>$lat,'longitude'=>$lon,'noiseLevel'=>$noiseLevel,'weight'=>$weight);
+        $latTmp = round(floatval(rand()/  getrandmax()),8);
+        $latTmp = $latTmp - round($latTmp,4) + $lat;
+        $lonTmp = round(floatval(rand()/  getrandmax()),8);
+        $lonTmp = $latTmp - round($latTmp,4) + $lon;
+        $response[$i] = array('latitude'=>$latTmp,'longitude'=>$lonTmp,'noiseLevel'=>$noiseLevel,'weight'=>$weight);
     }
    echo json_encode($response,true);
 }

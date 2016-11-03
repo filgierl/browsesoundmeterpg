@@ -44,15 +44,23 @@ function addPoint(location) {
 
 function handleResponse(location,data){
     var noiseLevel = 0.0;
+    var lat = location.lat();
+    var long = location.lng();
     var deviation = 0;
     var weight = 0.0;
     var  probability = [];
     for(var i=0;i<141;i++)
         probability[i] = 0;
-
+    var tmp;
     for(var i=0;i<data.length;i++){
-        noiseLevel += parseInt(data[i].noiseLevel) * parseFloat(data[i].weight);
-        weight += parseFloat(data[i].weight);
+        if(parseFloat(data[i].latitude) != lat || parseFloat(data[i].longitude != long)){
+            tmp = idw(lat, long,parseFloat( data[i].latitude),parseFloat(data[i].longitude)) * parseFloat(data[i].weight);
+        }
+        else{
+            tmp = parseFloat(data[i].weight);
+        }
+        noiseLevel += parseInt(data[i].noiseLevel) * tmp;
+        weight += tmp;
     }
     noiseLevel = noiseLevel /weight;
     for(var i=0;i<data.length;i++){
@@ -62,6 +70,17 @@ function handleResponse(location,data){
     deviation = parseInt(deviation/data.length);
     var prob = probability[parseInt(noiseLevel)]/data.length;
     drawCircle(location,parseInt(noiseLevel));
+}
+
+function idw(x1,y1,x2,y2){
+    var max = 1;
+    var min = 0.000025;
+    var xd = Math.ceil((x2 -x1) * 100000);
+    var yd = Math.ceil((y2-y1) * 100000);
+    var d = Math.sqrt(Math.pow(xd,2)+Math.pow(yd,2));
+    var wk = parseFloat((1/(Math.pow(d,4))).toFixed(6));
+    wk = ((wk-min)/(max-min))*(1-0)+0;
+    return 1.0-wk;
 }
 
 function drawCircle(location,noiseLevel){
