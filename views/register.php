@@ -9,7 +9,7 @@ include_once '../globalVariables.php';
         <meta charset="UTF-8">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
         <script src="./static_resources/scripts/form.js"></script>
-        <title><?php echo $web_name ?></title>
+        <title><?php echo web_name ?></title>
         <link rel="stylesheet" type="text/css" href="./static_resources/css/header.css">
         <link rel="stylesheet" type="text/css" href="./static_resources/css/register.css">
     </head>

@@ -6,6 +6,15 @@ include_once '../globalVariables.php';
 include_once '../bussines/db_connect.php';
 include_once '../bussines/errors.php';
 
+function errorlog($MSG, $level){
+  $db = DataBaseManager::getInstance();
+  $mysqli = $db->getConnection();
+  if ($stmt = $mysqli->prepare("INSERT INTO LOGS (LOG_TEXT) VALUES (?)") ){
+      $stmt->bind_param('s', $MSG);
+      $stmt->execute();
+  }
+}
+
 function handleError($ERROR, $ERROR_NUMBER){
     /* 
         Author     : Daniel
@@ -17,17 +26,17 @@ function handleError($ERROR, $ERROR_NUMBER){
             require '../views/register.php';
             break;
         case Errors::DATABASE_ERROR:
-            error_log($ERROR, 0);
+            errorlog($ERROR, 0);
             $ERROR_MSG = "Error 500";
             require '../views/error.php';
             break;
         case Errors::UNKNOWN_ERROR:
-            error_log($ERROR, 0);
+            errorlog($ERROR, 0);
             $ERROR_MSG = "Error 500";
             require '../views/error.php';
             break;
         case Errors::SESSION_ERROR:
-            error_log($ERROR, 0);
+            errorlog($ERROR, 0);
             $ERROR_MSG = "Error 500";
             require '../views/error.php';
             break;
@@ -41,16 +50,17 @@ function handleError($ERROR, $ERROR_NUMBER){
             require '../views/account.php';
             break;
         case Errors::BRUTE_FORCE:
-            error_log($ERROR, 0);
+            errorlog($ERROR, 0);
             $ERROR_MSG = "Your account is block because you pass to many times incorrect password";
             require '../views/account.php';
             break;
         default:
             $ERROR_MSG = "Error 500";
-            error_log("Error msg ".$ERROR." error code".$ERROR_NUMBER, 0);
+            errorlog("Error msg ".$ERROR." error code".$ERROR_NUMBER, 0);
             require '../views/error.php';
             break;
     }
+
 }
  
 function sec_session_start() {
@@ -68,6 +78,7 @@ function sec_session_start() {
     }
     
     $cookieParams = session_get_cookie_params();
+    $cookieParams["lifetime"] = 60*60*24; 
     session_set_cookie_params($cookieParams["lifetime"],
         $cookieParams["path"], 
         $cookieParams["domain"], 
@@ -87,13 +98,10 @@ function sec_session_start() {
 function process_login(){
     global $ERROR_MSG,$ERRORS;
     if (isset($_POST['email'], $_POST['password'])) {
-        $email = $_POST['email'];
-        $password = $_POST['password'];
+        $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
+        $password = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_STRING);
         if(!($email == null || $email === "" || $password == null || $password === "")){
 
-            $options = [
-                'cost' => 13,
-            ];
             $db = DataBaseManager::getInstance();
             $mysqli = $db->getConnection();
             return login($email, $password, $mysqli);
@@ -112,16 +120,15 @@ function process_login(){
 
 function login($email, $password, $mysqli) {
     global $ERROR_MSG,$ERRORS;
-    if ($stmt = $mysqli->prepare("SELECT id, username, password 
-        FROM members
-        WHERE email = ?
+    if ($stmt = $mysqli->prepare("SELECT ID, USERNAME, PASSWORD
+        FROM DBO_SMPG_USER
+        WHERE EMAIL = ?
         LIMIT 1")) {
         $stmt->bind_param('s', $email); 
         $stmt->execute();    
         $stmt->store_result();
         $stmt->bind_result($user_id, $username, $db_password);
         $stmt->fetch();
- 
         if ($stmt->num_rows == 1) {
             
             if (checkbrute($user_id, $mysqli) == true) {
@@ -146,7 +153,7 @@ function login($email, $password, $mysqli) {
                     return true;
                 } else {
                     $now = time();
-                    $mysqli->query("INSERT INTO login_attempts(user_id, time)
+                    $mysqli->query("INSERT INTO DBO_SMPG_LOGIN_ATTEMPTS(USERID, TIME)
                                     VALUES ('$user_id', '$now')");
                     $ERRORS = Errors::LOGIN_ERROR;
                     $ERROR_MSG  = INVALID_PASSWORD;
@@ -170,10 +177,10 @@ function checkbrute($user_id, $mysqli) {
  
     $valid_attempts = $now - (2 * 60 * 60);
  
-    if ($stmt = $mysqli->prepare("SELECT time 
-                             FROM login_attempts 
-                             WHERE user_id = ? 
-                            AND time > ?")) {
+    if ($stmt = $mysqli->prepare("SELECT TIME
+                             FROM DBO_SMPG_LOGIN_ATTEMPTS
+                             WHERE USERID = ? 
+                             AND TIME > ?")) {
         $stmt->bind_param('ii', $user_id,$valid_attempts);
  
         $stmt->execute();
@@ -200,9 +207,9 @@ function login_check($mysqli) {
         // Get the user-agent string of the user.
         $user_browser = $_SERVER['HTTP_USER_AGENT'];
  
-        if ($stmt = $mysqli->prepare("SELECT password 
-                                      FROM members 
-                                      WHERE id = ? LIMIT 1")) {
+        if ($stmt = $mysqli->prepare("SELECT PASSWORD
+                                      FROM DBO_SMPG_USER
+                                      WHERE ID = ? LIMIT 1")) {
             // Bind "$user_id" to parameter. 
             $stmt->bind_param('i', $user_id);
             $stmt->execute();   // Execute the prepared query.
@@ -248,11 +255,24 @@ function register(){
             $ERROR_MSG = EMPTY_FORM;
             return false;
          }
+         
+         if( strlen($username) <  6 || strlen($username) > 20){
+            $ERRORS = Errors::REGISTRATION_ERROR;
+            $ERROR_MSG = "Username should be at least 5 to 20 characters long";
+            return false;
+         }
+         
+         if( strlen($password) <  6 ){
+            $ERRORS = Errors::REGISTRATION_ERROR;
+            $ERROR_MSG = "Password should be at least 6  characters long";
+            return false;
+         }
+         
         
         $db = DataBaseManager::getInstance();
         $mysqli = $db->getConnection();
 
-        $prep_stmt = "SELECT id FROM members WHERE email = ? LIMIT 1";
+        $prep_stmt = "SELECT USERNAME FROM DBO_SMPG_USER WHERE EMAIL = ? LIMIT 1";
         $stmt = $mysqli->prepare($prep_stmt);
   
         if($stmt){
@@ -271,7 +291,7 @@ function register(){
             return false;
         }
 
-        $prep_stmt = "SELECT id FROM members WHERE username = ? LIMIT 1";
+        $prep_stmt = "SELECT * FROM DBO_SMPG_USER WHERE USERNAME = ? LIMIT 1";
         $stmt = $mysqli->prepare($prep_stmt);
 
         if($stmt){
@@ -290,13 +310,11 @@ function register(){
             return false;
         }
     
-        $options = [
-                'cost' => 13,
-            ];
+        $options = array( 'cost' => 13);
            
         $password = password_hash($password, PASSWORD_BCRYPT, $options);
 
-        if ($insert_stmt = $mysqli->prepare("INSERT INTO members (username, email, password) VALUES (?, ?, ?)")) {
+        if ($insert_stmt = $mysqli->prepare("INSERT INTO DBO_SMPG_USER(USERNAME, EMAIL, PASSWORD) VALUES (?, ?, ?)")) {
             $insert_stmt->bind_param('sss', $username, $email, $password);
             // Execute the prepared query.
             if (!$insert_stmt->execute()) {

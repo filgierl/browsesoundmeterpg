@@ -6,6 +6,19 @@
     include_once '../bussines/function.php';
     include_once '../bussines/db_connect.php';
     include_once '../bussines/errors.php';
+ 
+    //TODO uncomment on https server
+//    if (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] !== 'on') {
+//        if(!headers_sent()) {
+//            header("Status: 301 Moved Permanently");
+//            header(sprintf(
+//                'Location: https://%s%s',
+//                $_SERVER['HTTP_HOST'],
+//                $_SERVER['REQUEST_URI']
+//            ));
+//            exit();
+//        }
+//    }
     
     if(!sec_session_start()){
         handleError($ERROR_MSG,$ERRORS);
@@ -67,11 +80,11 @@
                 exit();
             }
         }
-        else
+        else{
             $url = "../views/main_page.php";
-
+        }
         require $url;
-    }
+        }
     
     
 ?>

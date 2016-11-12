@@ -6,7 +6,7 @@
        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
       
         
-        <title><?php echo $web_name ?></title>
+        <title><?php include_once("../globalVariables.php"); echo web_name ?></title>
         <link rel="stylesheet" type="text/css" href="./static_resources/css/header.css">
         <link rel="stylesheet" type="text/css" href="./static_resources/css/content.css">
         <script src="./static_resources/scripts/index_scripts.js"></script>

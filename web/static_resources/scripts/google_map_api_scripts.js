@@ -25,7 +25,12 @@ function initMap() {
 }
       
 function addPoint(location) {
-    var locationJSON = { "latitude" : location.lat(), "longitude"  : location.lng() };
+    var date =  $('#date').val();
+    var time = $("#time").val();
+    var locationJSON = { "latitude" : location.lat().toFixed(4), 
+                        "longitude"  : location.lng().toFixed(4), 
+                        "date" : date,
+                        "time" : time   };
     $.ajax({
         url:'/browsesoundmeterpg/web/noise',
         type:'POST',
@@ -44,43 +49,84 @@ function addPoint(location) {
 
 function handleResponse(location,data){
     var noiseLevel = 0.0;
-    var lat = location.lat();
-    var long = location.lng();
-    var deviation = 0;
+    var lat = location.lat().toFixed(4);
+    var long = location.lng().toFixed(4);
     var weight = 0.0;
-    var  probability = [];
-    for(var i=0;i<141;i++)
-        probability[i] = 0;
-    var tmp;
-    for(var i=0;i<data.length;i++){
-        if(parseFloat(data[i].latitude) != lat || parseFloat(data[i].longitude != long)){
-            tmp = idw(lat, long,parseFloat( data[i].latitude),parseFloat(data[i].longitude)) * parseFloat(data[i].weight);
-        }
-        else{
-            tmp = parseFloat(data[i].weight);
-        }
-        noiseLevel += parseInt(data[i].noiseLevel) * tmp;
-        weight += tmp;
-    }
-    noiseLevel = noiseLevel /weight;
-    for(var i=0;i<data.length;i++){
-        deviation += Math.abs(parseInt(data[i].noiseLevel) - parseInt(noiseLevel));
-        probability[parseInt(data[i].noiseLevel)] += 1;
-    }
-    deviation = parseInt(deviation/data.length);
-    var prob = probability[parseInt(noiseLevel)]/data.length;
+ 
+   noiseLevel = calculateNoiseLevel(data,lat,long);
+
     drawCircle(location,parseInt(noiseLevel));
 }
 
 function idw(x1,y1,x2,y2){
-    var max = 1;
-    var min = 0.000025;
-    var xd = Math.ceil((x2 -x1) * 100000);
-    var yd = Math.ceil((y2-y1) * 100000);
-    var d = Math.sqrt(Math.pow(xd,2)+Math.pow(yd,2));
+    var max = 100000000;
+    var min = 1000;
+    var d = getDistanceFromLatLonInKm(x1,y1,x2,y2);
     var wk = parseFloat((1/(Math.pow(d,4))).toFixed(6));
     wk = ((wk-min)/(max-min))*(1-0)+0;
-    return 1.0-wk;
+    wk = parseFloat(wk.toFixed(2));
+    return wk;
+}
+
+function calculateNoiseLevel(data, baseLat, baseLong){
+    var tmpNoise, tmpWeight; 
+    var noiseLevel = 0.0 ;
+    var weight= 0.0;
+    for(var i=0;i<data.length;i++){
+        if(data[i].latitude == baseLat && data[i].longitude == baseLong){
+            tmpWeight = parseFloat(data[i].weight);
+            tmpNoise = parseFloat(data[i].noiseLevel);
+        }else{
+            var tmp = calculateNoiseLevelInDifferentLocation(data[i].latitude, data[i].longitude, data, i, baseLat, baseLong);
+            i = tmp['i'];
+            tmpWeight = tmp["weight"];
+            tmpNoise = tmp["noiseLevel"];
+        }
+        noiseLevel += tmpNoise * tmpWeight;
+        weight += tmpWeight;
+    }
+    return noiseLevel /weight;
+}
+
+function calculateNoiseLevelInDifferentLocation(lat, long, data, i, baseLat, baseLong){
+    var tmpNoise, tmpWeight; 
+    var noiseLevel = 0.0 ;
+    var weight= 0.0;
+    for(;i<data.length;i++){
+        if(data[i].latitude == lat && data[i].longitude == long){
+            tmpWeight = parseFloat(data[i].weight);
+            tmpNoise = parseFloat(data[i].noiseLevel);
+        }else{
+            break;
+        }
+        noiseLevel += tmpNoise * tmpWeight;
+        weight += tmpWeight;
+    }
+    noiseLevel = noiseLevel /weight;
+    noiseLevel = Math.round(noiseLevel);
+    weight = idw(lat,long,baseLat,baseLong);
+    return {'i': --i,
+    "weight":weight,
+    "noiseLevel":noiseLevel};
+}
+
+function getDistanceFromLatLonInKm(x1,y1,x2,y2) {
+  //http://stackoverflow.com/questions/27928/calculate-distance-between-two-latitude-longitude-points-haversine-formula
+  var R = 6371; // Radius of the earth in km
+  var dLat = deg2rad(x2-x1);  // deg2rad below
+  var dLon = deg2rad(y2-y1); 
+  var a = 
+    Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(deg2rad(x1)) * Math.cos(deg2rad(x2)) * 
+    Math.sin(dLon/2) * Math.sin(dLon/2)
+    ; 
+  var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+  var d = R * c; 
+  return d;
+}
+
+function deg2rad(deg) {
+  return deg * (Math.PI/180);
 }
 
 function drawCircle(location,noiseLevel){
@@ -90,7 +136,7 @@ function drawCircle(location,noiseLevel){
         circle = new google.maps.Circle({
         center:location,
         map: map,
-        radius:10,
+        radius:11,
         strokeWeight: 1,
         strokeColor: '#000000',
         strokeOpacity: 0.4,
@@ -101,7 +147,7 @@ function drawCircle(location,noiseLevel){
         circle = new google.maps.Circle({
         center:location,
         map: map,
-        radius:10,
+        radius:11,
         strokeWeight: 0,
         fillColor:color,
         fillOpacity:0.4

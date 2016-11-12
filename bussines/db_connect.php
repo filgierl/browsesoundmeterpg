@@ -34,6 +34,13 @@ class DataBaseManager{
             }
         }
     }
+    
+    function __destruct() {
+        if(isset($this->connection)){
+            $this->connection->close();
+        }
+    }
+    
     private function __clone() { }
     public function getConnection() {
          return $this->connection;

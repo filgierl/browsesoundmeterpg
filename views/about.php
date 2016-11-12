@@ -6,7 +6,7 @@
         <meta charset="UTF-8">
       
         
-        <title><?php echo $web_name ?></title>
+        <title><?php echo web_name ?></title>
         <link rel="stylesheet" type="text/css" href="./static_resources/css/header.css">
     </head>
     <body>
