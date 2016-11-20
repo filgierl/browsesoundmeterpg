@@ -1,0 +1,123 @@
+/* 
+   
+    Author     : Daniel
+*/
+.account_div{
+    margin-top: 1%;
+    float: left;
+}
+
+#list_android{
+    float: left;
+    margin-left: 5%;
+}
+
+
+.account_button{
+    background-color: #125492;
+    float: left;
+    padding: 0.5%;   
+}
+
+.account_button a{
+    color: white;
+    text-decoration: none;
+    text-align: center;
+    color: white;
+    font-size: 1em;
+    background-color:transparent;
+}
+
+.account_button:hover{
+   background-color: #527393;
+    cursor: pointer;
+    color: rgba(50,13,14,156);
+}
+
+.account_button a:hover{
+    background-color: #527393;
+    cursor: pointer;
+    color: rgba(50,13,14,156); 
+}
+
+.account_button:hover  *{
+   background-color: #527393;
+    cursor: pointer;
+    color: rgba(50,13,14,156); 
+}
+
+#logout_button{
+    border-right: 1px solid white;
+}
+
+#change_password{
+    border-left: 1px solid white;
+}
+
+#username_account{
+     text-transform: uppercase;
+     display: inline;
+}
+
+table{
+    border-style: solid;
+    border-color: #527393;
+    border-width: 3px;
+    border-radius: 5px;
+    border-collapse:separate; 
+    border-spacing:10px 5px;
+}
+
+th{
+    font-size: 1em;
+    color: #527393;  
+}
+
+tbody{
+   overflow-y: auto;   
+   overflow-x: hidden; 
+   
+}
+
+thead tr th{
+    border-bottom-style: solid;
+    border-bottom-color: #527393;
+    border-bottom-width: 3px;
+
+    border-collapse:separate; 
+    border-spacing:5px 5px;
+}
+
+td{
+    text-align: center;
+}
+
+tbody tr:nth-child(2n+1){
+    background-color: rgba(255,200,187,0.2);
+}
+
+tr:hover td{
+    background-color: rgba(255,200,187,1);
+    cursor: pointer;
+}
+
+.remove_button{
+    background-color: #125492;
+    float: left;
+    padding: 0.5%;
+    color:white;
+    margin-left:42%;
+    border-radius:5px;
+    margin-top: 1%;
+}
+
+.remove_button:hover{
+    background-color: #527393;
+    cursor: pointer;
+    color: rgba(50,13,14,156); 
+}
+
+#remove_device{
+    float:left;
+    margin-left:20%;
+}

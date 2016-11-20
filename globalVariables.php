@@ -17,6 +17,13 @@ define("PROCESS_LOGIN_ACTION","/process_login");
 define("REGISTER_WEB_ACTION","/register_web");
 define("NOISE_ACTION","/noise");
 define("INSERT_ACTION","/insert");
+define("LOGIN_ANDROID","/login_android");
+define("LOGOUT_ANDROID_ACTION", "/logout_android");
+define("LOGOUT_ACTION","/logout");
+define("CHANGE_PASSWORD_ACTION","/change_password");
+define("REMOVE_MEASUREMENTS_ACTION","/remove_measurements");
+define("REMOVE_DEVICES_ACTION","/remove_devices");
+
 
 define("EMPTY_FORM","User send empty values in register POST");
 define("FORM_WITHOUT_DATA","User send empty register POST");

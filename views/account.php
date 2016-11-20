@@ -9,10 +9,13 @@ include_once '../globalVariables.php';
     <head>
         <meta charset="UTF-8">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-        <script src="./static_resources/scripts/form.js"></script>
+        <script src="./static_resources/scripts/account_information.js"></script>
         <title><?php echo web_name ?></title>
         <link rel="stylesheet" type="text/css" href="./static_resources/css/header.css">
         <link rel="stylesheet" type="text/css" href="./static_resources/css/login.css">
+        <link rel="stylesheet" type="text/css" href="./static_resources/css/account_information.css">
+        
+        
     </head>
     <body>
           <div class="container">  

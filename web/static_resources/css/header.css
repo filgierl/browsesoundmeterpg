@@ -92,3 +92,9 @@ nav {
     clear: both;
 }
 
+#error_msg_map{
+    color: red;
+    float: right;
+    margin-right: 45%;
+}
+

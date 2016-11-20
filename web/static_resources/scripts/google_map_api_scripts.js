@@ -27,6 +27,23 @@ function initMap() {
 function addPoint(location) {
     var date =  $('#date').val();
     var time = $("#time").val();
+    
+    var msgError = isTimeValid(time);
+    if(msgError.length > 0){
+        wrongData($("#time"),msgError);
+        return;
+    }
+    else
+        goodData($("#time"));
+    
+    msgError = isDataValid(date);
+    if( msgError.length > 0){
+        wrongData($("#date"),msgError );
+       return;
+    }
+    else
+        goodData($("#date"));
+    
     var locationJSON = { "latitude" : location.lat().toFixed(4), 
                         "longitude"  : location.lng().toFixed(4), 
                         "date" : date,
@@ -39,15 +56,17 @@ function addPoint(location) {
         data: JSON.stringify(locationJSON),
         success: function(data){
             handleResponse(location,data);
-        },
-        failure: function(errMsg) {
-             //TODO
         }
     });
    
 }
 
 function handleResponse(location,data){
+    if(data === "Too little data"){
+        $("#error_msg_map").text(data);
+        return;
+    }
+    $("#error_msg_map").text("");
     var noiseLevel = 0.0;
     var lat = location.lat().toFixed(4);
     var long = location.lng().toFixed(4);
@@ -63,7 +82,7 @@ function idw(x1,y1,x2,y2){
     var min = 1000;
     var d = getDistanceFromLatLonInKm(x1,y1,x2,y2);
     var wk = parseFloat((1/(Math.pow(d,4))).toFixed(6));
-    wk = ((wk-min)/(max-min))*(1-0)+0;
+    wk = ((wk-min)/(max-min))*(1000-0)+0;
     wk = parseFloat(wk.toFixed(2));
     return wk;
 }

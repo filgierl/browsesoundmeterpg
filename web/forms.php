@@ -25,6 +25,8 @@
             <input class="input" type="text" name="Latitude" id="Latitude"/><br>
             <label for="password">Longitude</label><br>
             <input class="input" type="text" name="Longitude" id="Longitude"/><br>
+            <label for="deviceID">deviceID</label><br>
+            <input class="input" type="text" name="DeviceID" id="DeviceID"/><br>
             <input id="register_button" type="submit" value="Login"  /> 
         </form>
     </body>

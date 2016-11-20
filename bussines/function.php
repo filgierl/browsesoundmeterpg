@@ -54,6 +54,10 @@ function handleError($ERROR, $ERROR_NUMBER){
             $ERROR_MSG = "Your account is block because you pass to many times incorrect password";
             require '../views/account.php';
             break;
+        case Errors::LIST_ERROR:
+            errorlog($ERROR, 0);
+            exit();
+            break;
         default:
             $ERROR_MSG = "Error 500";
             errorlog("Error msg ".$ERROR." error code".$ERROR_NUMBER, 0);
@@ -65,6 +69,29 @@ function handleError($ERROR, $ERROR_NUMBER){
  
 function sec_session_start() {
     global $ERRORS, $ERROR_MSG;
+    $session = my_session_start();
+    $db = DataBaseManager::getInstance();
+    $mysqli = $db->getConnection();
+    if(isset($_SESSION['CREATED'])){
+        $time = filter_var($_SESSION['CREATED'], FILTER_VALIDATE_INT);
+    }
+    if(isset($_SESSION['CREATED']) && isset($time) && $time >  1479330000 && (time() - $time > 60*60*24) && (login_check($mysqli) == true)){
+        session_unset(); 
+        session_destroy();
+        $session = my_session_start();
+    }
+    
+    $session = $session && session_regenerate_id(true);
+    $_SESSION['CREATED'] = time();
+    if($session)
+        return $session;
+    else{
+        $ERRORS = Errors::SESSION_ERROR;
+        $ERROR_MSG = "Can not use start session";
+    }
+}
+
+function my_session_start(){
     $session_name = 'sec_session_id';   
     session_name($session_name);
  
@@ -85,14 +112,19 @@ function sec_session_start() {
         $secure,
         $httponly);
  
-    $session = session_start();            
-    $session = $session && session_regenerate_id(true); 
-    if($session)
-        return $session;
-    else{
-        $ERRORS = Errors::SESSION_ERROR;
-        $ERROR_MSG = "Can not use start session";
-    }
+    return session_start();
+}
+
+function logout(){
+    $db = DataBaseManager::getInstance();
+    $mysqli = $db->getConnection();
+    if( login_check($mysqli) == true){
+        session_unset(); 
+        session_destroy();
+        return my_session_start( )&& session_regenerate_id(true); 
+    }else{
+        return true;
+    }    
 }
 
 function process_login(){
@@ -181,8 +213,7 @@ function checkbrute($user_id, $mysqli) {
                              FROM DBO_SMPG_LOGIN_ATTEMPTS
                              WHERE USERID = ? 
                              AND TIME > ?")) {
-        $stmt->bind_param('ii', $user_id,$valid_attempts);
- 
+        $stmt->bind_param('ii', $user_id,$valid_attempts); 
         $stmt->execute();
         $stmt->store_result();
  
@@ -337,3 +368,138 @@ function register(){
     }
 }
         
+function takeMeasurements($username){
+    $db = DataBaseManager::getInstance();
+    $mysqli = $db->getConnection();
+    $stmt = "SELECT ID FROM DBO_SMPG_USER WHERE USERNAME = ? LIMIT 1";
+    $stmt = $mysqli->prepare($stmt);
+  
+    if($stmt){
+        $stmt->bind_param('s', $username);
+        $stmt->execute();    
+        $stmt->store_result();
+        $stmt->bind_result($user_id);
+        $stmt->fetch();
+        if ($stmt->num_rows != 1){
+            $ERRORS = Errors::LIST_ERROR;
+            $ERROR_MSG = "Username do not exist but on account page - ".$username;
+            handleError($ERROR_MSG, $ERRORS);
+        }
+        $stmt = "SELECT AVG, MAX, MIN, WEIGHT, DATE, LOCATIONID, DEVICEID FROM DBO_SMPG_MEASUREMENT WHERE USERID = ? ORDER BY DATE DESC LIMIT 1000" ;
+        $stmt = $mysqli->prepare($stmt);
+         if($stmt){
+            $stmt->bind_param('i', $user_id);
+            $stmt->execute();    
+            $stmt->bind_result($avg,$max,$min,$weight,$date,$locationID,$deviceID);
+            $response = array();
+            $i = 0;
+            while ( $stmt->fetch() ) {
+                $response[$i] = array('Avg'=>$avg,
+                                      'Max'=>$max,
+                                      'Min'=>$min,
+                                      'Weight'=>$weight,
+                                      'Date'=>$date,
+                                      'Latitude'=>$locationID,
+                                      'Longitude'=>0,
+                                      'Device'=>$deviceID,);
+                $i++;
+            }
+            $length = count($response);
+            for($i=0;$i<$length;$i++){
+                $stmt = "SELECT LATITUDE, LONGITUDE FROM DBO_SMPG_LOCATION WHERE ID = ? LIMIT 1" ;
+                $stmt = $mysqli->prepare($stmt);
+                if($stmt){
+                    $stmt->bind_param('i', $response[$i]["Latitude"]);
+                    $stmt->execute();
+                    $stmt->store_result();
+                    $stmt->bind_result($latitude,$longitude);
+                    $stmt->fetch();
+                    if ($stmt->num_rows != 1){
+                        $ERRORS = Errors::LIST_ERROR;
+                        $ERROR_MSG = "Location do not exist but on account page - ".$username." ".$locationID;
+                        handleError($ERROR_MSG, $ERRORS);
+                    }
+                }else{
+                    $ERRORS = Errors::LIST_ERROR;
+                    $ERROR_MSG = "Can not prepare - takeMeasurements SELECT LATIUTUDE...";
+                    handleError($ERROR_MSG, $ERRORS);
+                }
+                $response[$i]["Latitude"] = $latitude;
+                $response[$i]["Longitude"] = $longitude;
+                if($response[$i]["Device"] != null){
+                    $stmt = "SELECT DEVICEID FROM DBO_SMPG_DEVICE WHERE ID = ? LIMIT 1" ;
+                    $stmt = $mysqli->prepare($stmt);
+                    if($stmt){
+                        $stmt->bind_param('i', $response[$i]["Device"]);
+                        $stmt->execute();
+                        $stmt->store_result();
+                        $stmt->bind_result($device_ID);
+                        $stmt->fetch();
+                        if ($stmt->num_rows != 1){
+                            $ERRORS = Errors::LIST_ERROR;
+                            $ERROR_MSG = "Device do not exist but on account page - ".$username." ".$deviceID;
+                            handleError($ERROR_MSG, $ERRORS);
+                        }
+                    }else{
+                        $ERRORS = Errors::LIST_ERROR;
+                        $ERROR_MSG = "Can not prepare - takeMeasurements SELECT DEVICE ID...";
+                        handleError($ERROR_MSG, $ERRORS);
+                    }
+                    $response[$i]["Device"] = $device_ID;
+                }
+            }
+            return $response;
+        }else{
+            $ERRORS = Errors::LIST_ERROR;
+            $ERROR_MSG = "Can not prepare - takeMeasurements SELCE AVG ...";
+            handleError($ERROR_MSG, $ERRORS);
+        }
+    }else{
+        $ERRORS = Errors::LIST_ERROR;
+        $ERROR_MSG = "Can not prepare - takeMeasurements SELECT ID...";
+        handleError($ERROR_MSG, $ERRORS);
+    }
+}
+
+function takeDevice($username){
+    $db = DataBaseManager::getInstance();
+    $mysqli = $db->getConnection();
+    $stmt = "SELECT ID FROM DBO_SMPG_USER WHERE USERNAME = ? LIMIT 1";
+    $stmt = $mysqli->prepare($stmt);
+    if($stmt){
+        $stmt->bind_param('s', $username);
+        $stmt->execute();    
+        $stmt->store_result();
+        $stmt->bind_result($user_id);
+        $stmt->fetch();
+        if ($stmt->num_rows != 1){
+            $ERRORS = Errors::LIST_ERROR;
+            $ERROR_MSG = "Username do not exist but on account page - ".$username;
+            handleError($ERROR_MSG, $ERRORS);
+        }
+        $stmt = "SELECT DEVICEID FROM DBO_SMPG_DEVICE WHERE USERID = ? LIMIT 1000" ;
+        $stmt = $mysqli->prepare($stmt);
+        if($stmt){
+           $stmt->bind_param('i', $user_id);
+           $stmt->execute();    
+           $stmt->bind_result($deviceID);
+           $response = array();
+           $i = 0;
+           while( $stmt->fetch() ) {
+               $response[$i] = array('Device'=>$deviceID,
+                                     );
+               $i++;
+           }
+           return $response;
+        }else{
+            $ERRORS = Errors::LIST_ERROR;
+            $ERROR_MSG = "Can not prepare - takeMeasurements SELCE DEVICEID ...";
+            handleError($ERROR_MSG, $ERRORS);
+        }
+        
+     }else{
+        $ERRORS = Errors::LIST_ERROR;
+        $ERROR_MSG = "Can not prepare - takeDevice SELECT ID...";
+        handleError($ERROR_MSG, $ERRORS);
+    }
+}

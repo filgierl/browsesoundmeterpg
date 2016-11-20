@@ -1,12 +1,9 @@
 <?php
 include_once '../bussines/validateDate.php';
-include_once '../bussines/function.php';
-
-
-
+include_once '../bussines/function.php';   
 if(isset($_POST['Max']) && isset($_POST['Min']) && isset($_POST['Weight']) &&
     isset($_POST['AvgNoise']) && isset($_POST['Latitude']) && isset($_POST['Longitude']) &&
-    isset($_POST['Date']) && isset($_POST['UserID'])){
+    isset($_POST['Date']) && isset($_POST['UserID']) && isset($_POST['DeviceID'])){
     $min = filter_input(INPUT_POST, 'Min', FILTER_SANITIZE_NUMBER_INT);
     $max = filter_input(INPUT_POST, 'Max', FILTER_SANITIZE_NUMBER_INT);
     $avg = filter_input(INPUT_POST, 'AvgNoise', FILTER_SANITIZE_NUMBER_INT);
@@ -15,10 +12,11 @@ if(isset($_POST['Max']) && isset($_POST['Min']) && isset($_POST['Weight']) &&
     $longitude = filter_var($_POST['Longitude'], FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
     $date = filter_input(INPUT_POST, 'Date', FILTER_SANITIZE_STRING);
     $userID =  filter_input(INPUT_POST, 'UserID', FILTER_SANITIZE_STRING);
-   
+    $deviceID = filter_input(INPUT_POST, 'DeviceID', FILTER_SANITIZE_STRING);    
+
     if(!isset($min) || !isset($max) || !isset($avg) ||
       !isset($latitude) || !isset($longitude) || !isset($date) ||
-      !isset($userID) || !isset($weight)){
+      !isset($userID) || !isset($weight) || !isset($deviceID)){
        exit();
     }
     
@@ -59,6 +57,7 @@ if(isset($_POST['Max']) && isset($_POST['Min']) && isset($_POST['Weight']) &&
     if( 0>$weight || $weight>1000){
         exit();
     }
+   
     $tmp_latitude = round(floatval($latitude),4);
     $tmp_longitude = round(floatval($longitude),4);
     if($tmp_latitude < -85.0 || $tmp_latitude > 85.0){
@@ -89,8 +88,8 @@ if(isset($_POST['Max']) && isset($_POST['Min']) && isset($_POST['Weight']) &&
     }else{
         exit();
     }
-    
-    if(login_check($mysqli) == false){ // todo
+   
+    if(login_check($mysqli) == false){ 
         exit();
     }else{
        if($_SESSION['username'] != $username){
@@ -124,15 +123,46 @@ if(isset($_POST['Max']) && isset($_POST['Min']) && isset($_POST['Weight']) &&
     }else{
         exit();
     }
+
+    if ($stmt = $mysqli->prepare("SELECT ID FROM DBO_SMPG_DEVICE
+                                WHERE DEVICEID = ? AND USERID = ?
+                                LIMIT 1")) 
+    {
+        $stmt->bind_param('si', $deviceID,$id); 
+        $stmt->execute();    
+        $stmt->store_result();
+        $stmt->bind_result($device_ID);
+        $stmt->fetch();
+        if ($stmt->num_rows != 1){
+            if ($stmt = $mysqli->prepare("INSERT INTO DBO_SMPG_DEVICE (DEVICEID, USERID) VALUES (?, ?)")) 
+            {
+                $stmt->bind_param('si', $deviceID,$id); 
+                if($stmt->execute())  { 
+                    $device_ID = $mysqli->insert_id;
+                }else{
+                    exit();
+                }
+            }else{
+                exit();
+            }
+        }            
+    }else{
+        exit();
+    }
     
-    $stmt = "INSERT INTO DBO_SMPG_MEASUREMENT(MIN, MAX, AVG, DATE, WEIGHT, USERID, LOCATIONID) values (?,?,?,?,?,?,?)";
+    
+    
+    $stmt = "INSERT INTO DBO_SMPG_MEASUREMENT(MIN, MAX, AVG, DATE, WEIGHT, USERID, LOCATIONID, DEVICEID) values (?,?,?,?,?,?,?,?)";
     $stmt = $mysqli->prepare($stmt);
     if($stmt){
-        $stmt->bind_param('iiisiii', $tmp_min,$tmp_max,$tmp_avg,$date,$weight,$id,$location_id);
+        echo $stmt->error;
+        $stmt->bind_param('iiisiiii', $tmp_min,$tmp_max,$tmp_avg,$date,$weight,$id,$location_id, $device_ID);
         $stmt->execute(); 
     }else{
         exit();
     }
+ 
 }
 
 
+			

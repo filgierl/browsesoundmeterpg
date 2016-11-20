@@ -79,12 +79,24 @@
                 handleError($ERROR_MSG, $ERRORS);
                 exit();
             }
-        }
-        else{
+        }else if( $action === LOGIN_ANDROID){
+            $url = "../bussines/android/loginAndroid.php";
+        }else if( $action === CHECK_SESSION_ANDROID){
+            $url = "../bussines/android/checkSessionAndroid.php";
+        }else if($action === LOGOUT_ACTION){
+            if(logout()){
+                $url = "../views/account.php";
+            }else{
+                handleError($ERROR_MSG, $ERRORS);
+                exit();
+            }
+        }else if( $action === LOGOUT_ANDROID_ACTION){
+           $url = "../bussines/android/logout.php";
+         }else{
             $url = "../views/main_page.php";
         }
         require $url;
-        }
+    }
     
     
 ?>

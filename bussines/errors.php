@@ -10,5 +10,6 @@ abstract class Errors{
     const REQEST_ERROR = 4;
     const BRUTE_FORCE = 5;
     const LOGIN_ERROR = 6;
+    const LIST_ERROR = 7;
 }
 
