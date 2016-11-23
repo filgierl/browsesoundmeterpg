@@ -111,3 +111,25 @@ function validCnfpassword(){
 function clearCnfpassword(){
     clearInput("#confirmpwd",sameCnfpasswordError);
 }
+var lengthOldPasswordError = "Old password should be at least 6  characters long";
+
+$(document).on("focusout","#old_password",validOldPassword);
+$(document).on("focus","#old_password",clearOldPassword);
+
+function validOldPassword(){
+    var password = $("#old_password").val();
+    if(password.length < 6){
+        errorValid("#old_password",lengthOldPasswordError);
+        return false;
+    }
+    return true;
+}
+
+function clearOldPassword(){
+    clearInput("#old_password",lengthOldPasswordError);
+}
+
+
+function validChangeForm() {    
+    return validOldPassword() && validPassword() && validCnfpassword();
+}

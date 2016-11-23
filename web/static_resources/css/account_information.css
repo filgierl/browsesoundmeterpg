@@ -121,3 +121,8 @@ tr:hover td{
     float:left;
     margin-left:20%;
 }
+
+#scroll_view{
+    height:80%;
+   overflow:auto;  
+}

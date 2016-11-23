@@ -1,4 +1,3 @@
-
 <?php 
 /* 
     Created on : Oct 16, 2016, 4:45:23 PM
@@ -21,6 +20,7 @@ define("LOGIN_ANDROID","/login_android");
 define("LOGOUT_ANDROID_ACTION", "/logout_android");
 define("LOGOUT_ACTION","/logout");
 define("CHANGE_PASSWORD_ACTION","/change_password");
+define("CHANGE_PASSWORD_ACTION_POST","/change_password_post");
 define("REMOVE_MEASUREMENTS_ACTION","/remove_measurements");
 define("REMOVE_DEVICES_ACTION","/remove_devices");
 
@@ -30,6 +30,7 @@ define("FORM_WITHOUT_DATA","User send empty register POST");
 define("INVALID_EMAIL","Email is not valid");
 define("EMAIL_EXIST","Account with this email exist");
 define("USER_EXIST","User with this name exist");
+define("CHECK_SESSION_ANDROID", "/checkSessionAndroid");
 
 
 define("EMPTY_FORM_LOGIN","User send empty values in register POST");

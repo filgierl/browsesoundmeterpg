@@ -9,6 +9,7 @@
     <div class="clear"></div>
 </div>
 <div class="account_div list" id="list_measurments">
+    <div id="scroll_view">
     <table>
         <thead>
             <th>#</th>
@@ -43,6 +44,7 @@
         ?>
         </tbody>
     </table>
+   <div>
     <div id="remove_measurments" class="remove_button">Remove</div>
 </div>
 <div class="account_div list" id="list_android">

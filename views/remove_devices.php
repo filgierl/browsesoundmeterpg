@@ -64,8 +64,17 @@ for($i=1;$i<$length;$i++){
     }else{
         exit();
     }
+
     
-    
+    //todo uncomment if databse not support relations
+//    $stmt = "UPDATE DBO_SMPG_MEASUREMENT SET DEVICEID = NULL WHERE DEVICEID = ?";
+//    $stmt = $mysqli->prepare($stmt);
+//    if ($stmt){
+//        $stmt->bind_param('i',$deviceID); 
+//        $stmt->execute();                    
+//    }else{
+//        exit();
+//    }
 }
 
 

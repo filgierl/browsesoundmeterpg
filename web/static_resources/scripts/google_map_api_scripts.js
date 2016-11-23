@@ -104,7 +104,10 @@ function calculateNoiseLevel(data, baseLat, baseLong){
         noiseLevel += tmpNoise * tmpWeight;
         weight += tmpWeight;
     }
-    return noiseLevel /weight;
+    if(weight != 0)
+        return noiseLevel /weight;
+    else
+        return noiseLevel;
 }
 
 function calculateNoiseLevelInDifferentLocation(lat, long, data, i, baseLat, baseLong){
@@ -121,9 +124,10 @@ function calculateNoiseLevelInDifferentLocation(lat, long, data, i, baseLat, bas
         noiseLevel += tmpNoise * tmpWeight;
         weight += tmpWeight;
     }
-    noiseLevel = noiseLevel /weight;
+    if(weight != 0)
+        noiseLevel = noiseLevel /weight;
     noiseLevel = Math.round(noiseLevel);
-    weight = idw(lat,long,baseLat,baseLong);
+    weight = Math.round(idw(lat,long,baseLat,baseLong));
     return {'i': --i,
     "weight":weight,
     "noiseLevel":noiseLevel};

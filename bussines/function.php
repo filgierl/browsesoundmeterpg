@@ -25,6 +25,10 @@ function handleError($ERROR, $ERROR_NUMBER){
             $ERROR_MSG = $ERROR;
             require '../views/register.php';
             break;
+        case Errors::CHANGE_PASSWORD_ERROR:
+            $ERROR_MSG = $ERROR;
+            require '../views/change_password.php';
+            break;
         case Errors::DATABASE_ERROR:
             errorlog($ERROR, 0);
             $ERROR_MSG = "Error 500";
@@ -361,6 +365,88 @@ function register(){
             return false;
         }
 
+    }else{
+        $ERRORS = Errors::UNKNOWN_ERROR;
+        $ERROR_MSG = FORM_WITHOUT_DATA;
+        return false;
+    }
+}
+
+function change_password(){
+    global $ERRORS, $ERROR_MSG;
+    if (isset($_POST['old_password'], $_POST['password'])) {
+        $password = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_STRING);
+        $oldPassword = filter_input(INPUT_POST, 'old_password', FILTER_SANITIZE_STRING);
+        if( !isset($password) || !isset($oldPassword)){
+            $ERRORS = Errors::UNKNOWN_ERROR;
+            $ERROR_MSG = EMPTY_FORM;
+            return false;
+        }
+        
+        if( strlen($password) <  6 ){
+            $ERRORS = Errors::CHANGE_PASSWORD_ERROR;
+            $ERROR_MSG = "Password should be at least 6  characters long";
+            return false;
+        }
+        
+        if( strlen($oldPassword) <  6 ){
+            $ERRORS = Errors::CHANGE_PASSWORD_ERROR;
+            $ERROR_MSG = "Old password should be at least 6  characters long";
+            return false;
+        } 
+        $db = DataBaseManager::getInstance();
+        $mysqli = $db->getConnection();
+        
+        if(login_check($mysqli) == false){ 
+            $ERRORS = Errors::CHANGE_PASSWORD_ERROR;
+            $ERROR_MSG = "You are not log in";
+            return false;
+        }
+        
+        $username = $_SESSION['username'];
+         
+        $stmt = "SELECT ID, PASSWORD FROM DBO_SMPG_USER WHERE USERNAME = ? LIMIT 1";
+        $stmt = $mysqli->prepare($stmt);
+
+        if($stmt){
+            $stmt->bind_param('s', $username);
+            $stmt->execute();    
+            $stmt->store_result();
+            $stmt->bind_result($user_id, $old_Password);
+            $stmt->fetch();
+            if ($stmt->num_rows != 1){
+                $ERRORS = Errors::UNKNOWN_ERROR;
+                $ERROR_MSG = "Username do not exist but on change password page - ".$username;
+                handleError($ERROR_MSG, $ERRORS);
+            }
+            if(!password_verify($oldPassword, $old_Password)) {
+                $ERRORS = Errors::CHANGE_PASSWORD_ERROR;
+                $ERROR_MSG = "Old password is incorrect";
+                return false;
+            }
+            
+            $options = array( 'cost' => 13);
+            $password = password_hash($password, PASSWORD_BCRYPT, $options);
+            $stmt = "UPDATE DBO_SMPG_USER SET PASSWORD = ? WHERE id = ?";
+            $stmt = $mysqli->prepare($stmt);
+
+            if($stmt){
+                $stmt->bind_param('si',$password ,$user_id);
+                $stmt->execute();
+                logout();
+                return true;
+            }else{
+                $ERRORS = Errors::DATABASE_ERROR;
+                $ERROR_MSG = "Can not change password";
+                return false;
+            }
+            
+        }else{
+            $ERRORS = Errors::DATABASE_ERROR;
+            $ERROR_MSG = "Can not prepare select id user in change password";
+            return false;
+        }
+        
     }else{
         $ERRORS = Errors::UNKNOWN_ERROR;
         $ERROR_MSG = FORM_WITHOUT_DATA;

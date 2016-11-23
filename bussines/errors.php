@@ -11,5 +11,6 @@ abstract class Errors{
     const BRUTE_FORCE = 5;
     const LOGIN_ERROR = 6;
     const LIST_ERROR = 7;
+    const CHANGE_PASSWORD_ERROR = 8;
 }
 

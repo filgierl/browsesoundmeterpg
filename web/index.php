@@ -92,6 +92,13 @@
             }
         }else if( $action === LOGOUT_ANDROID_ACTION){
            $url = "../bussines/android/logout.php";
+         }else if($action === CHANGE_PASSWORD_ACTION_POST){
+             if(change_password()){
+                $url = "../views/account.php";
+            }else{
+                handleError($ERROR_MSG, $ERRORS);
+                exit();
+            }
          }else{
             $url = "../views/main_page.php";
         }
