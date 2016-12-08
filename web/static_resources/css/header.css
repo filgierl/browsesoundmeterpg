@@ -11,6 +11,16 @@
     color: #125492;
 }
 
+span{
+    color: white;
+}
+
+#maps_help{
+    margin-left: -30px;
+    height: 500px;
+    width: 800px;
+}
+
 html, body {
     min-height: 100%;
     height: 100%;

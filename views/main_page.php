@@ -50,6 +50,19 @@
         <script async defer
             src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAIZ6lrh5AIwOz-Vaihe2hMN2kvFkbOp2o&callback=initMap">
         </script>
+         <script type="text/javascript" id="cookieinfo"   
+            src="//cookieinfoscript.com/js/cookieinfo.min.js"
+            data-font-size ="1em"
+            data-font-family="Arial"
+            data-bg="#125492"
+            data-fg="#FFFFFF"
+            data-link="#F1D600"
+            data-linkmsg="here."
+            data-cookie="CookieInfoScript"
+            data-text-align="left"	
+            data-close-text="I agree"
+            data-message="This web site uses cookies. By continuing to visit this site you agree to the policy of cookies. Find out more">
+        </script>
     </body>
 </html>
 
